@@ -1,0 +1,4 @@
+interface:
+  display_name: "Git Period Report"
+  short_description: "Summarize git changes into reports"
+  default_prompt: "Use $git-period-report to generate a weekly report for this repository."
