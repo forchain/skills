@@ -6,6 +6,7 @@ This repository stores personal skills for Codex and other agent runtimes.
 
 | Skill | Purpose |
 | --- | --- |
+| `career-agent` | Maintain career memory and generate grounded job-search materials. |
 | `git-period-report` | Generate weekly, monthly, or custom-period reports from Git history and final-state diffs. |
 
 ## Install
