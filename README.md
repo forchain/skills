@@ -7,6 +7,7 @@ This repository stores personal skills for Codex and other agent runtimes.
 | Skill | Purpose |
 | --- | --- |
 | `git-period-report` | Generate weekly, monthly, or custom-period reports from Git history and final-state diffs. |
+| `repair-git-history` | Audit and safely repair Git identities, messages, tags, and release history. |
 
 ## Install
 

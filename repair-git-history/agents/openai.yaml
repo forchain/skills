@@ -1,0 +1,4 @@
+interface:
+  display_name: "Repair Git History"
+  short_description: "Audit and safely repair Git history"
+  default_prompt: "Use $repair-git-history to audit this repository and prepare a safe history repair plan."
