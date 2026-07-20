@@ -1,0 +1,4 @@
+interface:
+  display_name: "Black-Box Acceptance Gate"
+  short_description: "Gates changes with independent black-box evidence"
+  default_prompt: "Use $blackbox-acceptance-gate to define approved acceptance gates, isolate development from testing, collect externally verifiable evidence, and issue a traceable verdict."
