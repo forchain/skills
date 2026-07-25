@@ -45,3 +45,7 @@ Individual skills can also be checked with Codex's skill-creator validator:
 ```bash
 python3 /Users/tonyoutlier/.codex/skills/.system/skill-creator/scripts/quick_validate.py git-period-report
 ```
+
+## Agent Guidelines
+
+See [AGENTS.md](AGENTS.md) for repository-level rules and iron laws, including GitHub account resolution from `remote.origin.url`.

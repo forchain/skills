@@ -6,6 +6,7 @@ Read this file whenever execution produces an error, blocker, bypass, disputed r
 
 | Classification | Meaning | Required action |
 | --- | --- | --- |
+| `precheck_blocker` | Precondition probe failed for a required database, log, API, credential, or environment dependency prior to document review | Issue a Precondition Shortage Alert, resolve missing resource/credential, re-probe until 100% pass before requesting User Review |
 | `actionable` | An approved public or operator action can safely restore the prerequisite | Record the original error, remediate in-band, retry once, and record both outcomes |
 | `force_majeure` | The run cannot practically resolve an external outage, suspension, billing state, permission, credential, or resource gap | Mark only affected items `skipped_force_majeure`; continue independent safe items |
 | `hard_fail` | A required capability failed or actionable remediation did not recover it | Mark failed, stop dependent tests, and reopen system work |

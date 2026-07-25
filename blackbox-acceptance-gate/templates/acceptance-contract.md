@@ -6,7 +6,9 @@
 - workflow_id:
 - skill_run_root: docs/acceptance/blackbox-acceptance/<run-id>/
 - source_contract:
+- precondition_report: docs/acceptance/blackbox-acceptance/<run-id>/precondition-report.md
 - governed_rules:
+  - precondition_check_gate
   - document_approval_gate
   - blackbox_boundary
   - exception_force_majeure_policy
@@ -35,6 +37,8 @@
 - External systems:
 - Data access:
 - Safety limits:
+- Precheck Status: pending | passed | blocked
+- Precondition Check Report: [precondition-report.md](precondition-report.md)
 
 ## Acceptance Gates
 | ID | Capability | Required Evidence | Human-Visible Proof | Status |
