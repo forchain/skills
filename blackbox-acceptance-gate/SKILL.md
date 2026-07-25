@@ -5,7 +5,7 @@ description: Gate acceptance of new or existing implementations through an appro
 
 # Black-Box Acceptance Gate
 
-Run acceptance as a gated state machine: **contract -> approval -> isolation -> execution -> verdict**. Durable artifacts, not conversation history, are the source of truth.
+Run acceptance as a gated state machine: **contract -> precheck -> approval -> isolation -> execution -> verdict**. Durable artifacts, not conversation history, are the source of truth.
 
 ## Boundary
 
@@ -20,11 +20,12 @@ Choose the mode:
 - **New development**: define acceptance before implementation.
 - **Existing implementation**: treat the current build as the system under test and reconstruct criteria only from user intent and public requirements.
 
-Create or update the three artifacts from `templates/`:
+Create or update the four artifacts from `templates/`:
 
-- acceptance contract
-- testing checklist
-- execution report
+- acceptance contract (`acceptance-contract.md`)
+- precondition check report (`precondition-report.md`)
+- testing checklist (`testing-checklist.md`)
+- execution report (`execution-report.md`)
 
 Default run root: `docs/acceptance/blackbox-acceptance/<run-id>/`. Preserve an established repository location when one exists and record it as `skill_run_root`.
 
@@ -39,17 +40,28 @@ source_contract: <path>
 
 Map every required acceptance gate to at least one checklist item with a purpose, setup, public actions, expected observable result, evidence, human verification path, and failure handling. Create or reuse a development plan only when system changes are required.
 
-**Complete when:** the three artifacts exist, metadata is valid, every required gate is testable from the outside, and every gate has an evidence path.
+**Complete when:** the four artifacts exist, metadata is valid, every required gate is testable from the outside, and every gate has an evidence path.
+
+## 1.5 Precheck Dependencies
+
+Before presenting any contract or plan to the User for review, perform mandatory read-only diagnostic checks for all required external resources, dependencies, and prerequisites.
+
+1. **Identify dependencies**: Enumerate every external resource required for execution or acceptance (e.g., databases, log directory access, exchange/third-party API endpoints, test account credentials, environment variables, required CLI binaries).
+2. **Execute diagnostic probes**: Run read-only, non-mutating operator diagnostic commands (e.g., connection ping, API status check, permission read test, version check). Do NOT use mock objects to fake connectivity or assume prerequisites pass without empirical proof.
+3. **Record evidence**: Append raw diagnostic outputs, timestamps, and pass/fail statuses to `precondition-report.md`.
+4. **Enforce hard block**: If any required dependency is `failed` or `unclear/missing`, **DO NOT submit the document/contract for User Review**. Issue a `Precondition Shortage Alert` listing the exact missing resources or failed checks, resolve them or prompt the User for missing credentials/info, and re-probe until all dependencies pass.
+
+**Complete when:** `precondition-report.md` exists, 100% of required dependencies have `passed` status with timestamped diagnostic evidence, and `precheck_status` in the contract is set to `passed`.
 
 ## 2. Lock Approval
 
-Present the artifacts or changed sections to the User. Do not implement or execute tests until the User approves the current contract and checklist.
+Present the artifacts, precheck report, and checklist to the User ONLY AFTER Section 1.5 (Precheck Dependencies) has 100% passed. Do not implement or execute tests until the User approves the current contract and checklist.
 
-Before approval, limit discovery to read-only work without external side effects, scarce-resource use, or third-party mutation. If feedback changes scope, evidence, resources, permissions, remediation, or verifiability, update the artifacts and obtain approval again for any material contract change.
+Before approval, limit discovery to read-only work without external side effects, scarce-resource use, or third-party mutation. If feedback changes scope, evidence, resources, permissions, remediation, or verifiability, update the artifacts, re-run prechecks if dependencies changed, and obtain approval again for any material contract change.
 
 If the User rejects evidence previously marked passed, set the item to `reopened` or `failed` immediately.
 
-**Complete when:** the contract records the approved version and date, and all material feedback appears in the artifact set.
+**Complete when:** `precondition-report.md` is 100% passed, the contract records the approved version and date, and all material feedback appears in the artifact set.
 
 ## 3. Enforce Isolation
 
