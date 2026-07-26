@@ -1,0 +1,4 @@
+interface:
+  display_name: "Career Agent"
+  short_description: "Personal career memory and job materials"
+  default_prompt: "Use $career-agent to turn my resume, career memory, and a job description into a grounded job application message."
