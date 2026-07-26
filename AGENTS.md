@@ -11,3 +11,18 @@
 2. **解析目标账号**：从返回的 `remote.origin.url`（例如 `https://forchain@github.com/forchain/skills`）中准确解析项目所绑定的 GitHub 账号（例如 `forchain`）。
 3. **隔离全局账号状态**：**严禁**盲目使用当前系统全局激活或登录的 GitHub 账号/凭证来推断本项目的提交与分支身份。全局激活的账号可能是为其他项目使用的，而不同项目使用的 GitHub 账号各不相同。
 4. **绑定身份执行**：所有的提交 Author/Committer 以及 GitHub CLI / API 操作，必须严格与 `remote.origin.url` 解析出来的账号对齐。
+
+## Agent skills
+
+### Issue tracker
+
+Issues and PRDs live in GitHub Issues. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Use the default five-label vocabulary. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+This is a single-context repository. See `docs/agents/domain.md`.
+
