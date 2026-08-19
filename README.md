@@ -9,6 +9,7 @@ This repository stores personal skills for Codex and other agent runtimes.
 | `blackbox-acceptance-gate` | Gate changes through approved criteria, isolated black-box testing, verifiable evidence, and a traceable verdict. |
 | `career-agent` | Maintain career memory and generate grounded job-search materials. |
 | `git-period-report` | Generate weekly, monthly, or custom-period reports from Git history and final-state diffs. |
+| `pr-tag-release` | Automate PR merge tagging (`v<Major>.<PR_ID>.<commits>`), GitHub Releases, and out-of-order PR backfills. |
 | `repair-git-history` | Audit and safely repair Git identities, messages, tags, and release history. |
 
 ## Install
