@@ -1,0 +1,4 @@
+interface:
+  display_name: "PR Tag & Release"
+  short_description: "Automate PR merge tagging, releases, and backfills"
+  default_prompt: "Use $pr-tag-release to install, audit, or configure automated PR tagging and GitHub releases in this repository."
