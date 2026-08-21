@@ -1,0 +1,4 @@
+interface:
+  display_name: "Link Agent Skills"
+  short_description: "Symlink agent skills from ~/.agents/skills to Antigravity global config"
+  default_prompt: "Use $link-agent-skills to symlink agent skills from ~/.agents/skills to Antigravity's global skills directory (~/.gemini/config/skills) with automatic conflict resolution."
