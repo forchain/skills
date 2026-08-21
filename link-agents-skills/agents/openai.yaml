@@ -1,0 +1,4 @@
+interface:
+  display_name: "Link Agents Skills"
+  short_description: "Symlink universal agent skills to Antigravity, Claude, and custom agents"
+  default_prompt: "Use $link-agents-skills to symlink universal agent skills from ~/.agents/skills to non-standard agent directories (Antigravity ~/.gemini/config/skills, Claude ~/.claude/skills, etc.) with automatic conflict resolution."
