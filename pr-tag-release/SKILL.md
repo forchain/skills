@@ -1,6 +1,7 @@
 ---
 name: pr-tag-release
 description: "Automate PR merge tagging, releases, and backfills. Tags merged PRs with v<Major>.<PR_ID>.<commits>, creates GitHub Releases, and handles out-of-order PR merges by updating the latest release and PR description. Use when setting up, auditing, or configuring automated PR release tagging in a repository."
+summary: "Automate PR merge tagging (`v<Major>.<PR_ID>.<commits>`), GitHub Releases, and out-of-order PR backfills."
 ---
 
 # PR Tag & Release Automation

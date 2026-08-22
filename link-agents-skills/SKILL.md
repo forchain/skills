@@ -1,6 +1,7 @@
 ---
 name: link-agents-skills
 description: "Symlink universal agent skills from standard hub (~/.agents/skills) to non-standard agent directories (Google Antigravity ~/.gemini/config/skills, Claude Code ~/.claude/skills, etc.) with automatic conflict resolution. Use when the user asks to link, sync, or make skills installed via the community `skills` CLI work seamlessly across Antigravity, Claude, and other AI agents."
+summary: "Symlink universal agent skills from standard hub (`~/.agents/skills`) to agent directories with conflict resolution."
 ---
 
 # Link Agents Skills

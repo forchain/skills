@@ -1,6 +1,7 @@
 ---
 name: blackbox-acceptance-gate
 description: Gate acceptance of new or existing implementations through an approved contract, independent black-box testing, externally verifiable evidence, and a traceable verdict. Use when development and acceptance must stay isolated or when a release needs user-approved acceptance criteria.
+summary: Gate changes through approved criteria, isolated black-box testing, verifiable evidence, and a traceable verdict.
 ---
 
 # Black-Box Acceptance Gate

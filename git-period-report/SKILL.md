@@ -1,6 +1,7 @@
 ---
 name: git-period-report
 description: "Generate git-based period reports from repository history: weekly reports by default, monthly reports, custom date-range summaries, commit-history reports, and squashed-diff/final-state reports. Use when the user asks for a weekly report, monthly report, work report, changelog-like status report, or asks to summarize commits or changes over a time window."
+summary: "Generate weekly, monthly, or custom-period reports from Git history and final-state diffs."
 ---
 
 # Git Period Report
