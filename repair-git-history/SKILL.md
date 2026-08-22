@@ -1,6 +1,7 @@
 ---
 name: repair-git-history
 description: "Repair Git history across repositories. Use for incorrect commit identities, non-English commit messages, evidence-backed tags or Releases, wrong GitHub accounts, and repository professionalism audits."
+summary: "Audit and safely repair Git identities, messages, tags, and release history."
 ---
 
 # Repair Git History

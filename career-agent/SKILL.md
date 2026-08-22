@@ -1,6 +1,7 @@
 ---
 name: career-agent
 description: "Career agent for job-search materials. Use when the user wants to import resumes, maintain personal career memory, calibrate professional voice, analyze job descriptions, generate grounded job application messages or cover letters, or review career memory."
+summary: "Maintain career memory and generate grounded job-search materials."
 ---
 
 # Career Agent
