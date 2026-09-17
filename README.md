@@ -11,7 +11,7 @@ This repository stores personal skills for Codex and other agent runtimes.
 | `career-agent` | Maintain career memory and generate grounded job-search materials. |
 | `git-period-report` | Generate weekly, monthly, or custom-period reports from Git history and final-state diffs. |
 | `link-agents-skills` | Symlink universal agent skills from standard hub (`~/.agents/skills`) to agent directories with conflict resolution. |
-| `pr-tag-release` | Automate PR merge tagging (`v<Major>.<PR_ID>.<commits>`), GitHub Releases, and out-of-order PR backfills. |
+| `pr-tag-release` | Automate PR merge tagging (`v<Major>.<Merged_PR_Count>.<commits>`), GitHub Releases, and legacy tag overwrite. |
 | `repair-git-history` | Audit and safely repair Git identities, messages, tags, and release history. |
 <!-- SKILLS_TABLE_END -->
 

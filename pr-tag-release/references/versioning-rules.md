@@ -12,33 +12,33 @@ v<Major>.<Minor>.<Patch>
   - Read from the `VERSION` file located at the repository root.
   - Defaults to `0` if the file is absent or empty.
   - Maintainers bump this manually (e.g. `0` -> `1`) via a commit/PR when a milestone changes.
-- **Minor (次版本号 / PR 编号)**:
-  - The integer ID of the merged Pull Request (e.g. `17`).
+- **Minor (次版本号 / 累计合并 PR 数量)**:
+  - The sequential count of merged Pull Requests targeting the base branch (e.g. `5` for the 5th merged PR).
+  - Queried via GitHub API to ensure accuracy across all merge strategies (merge commits, squash merges, rebase merges).
+  - Unaffected by GitHub Issue or Discussion counters.
 - **Patch (修订号 / Commit 数量)**:
   - The total number of commits contained in that PR (read directly from GitHub PR metadata `pull_request.commits`).
 
 ### Example
 - `VERSION` contains `0`.
-- PR #17 containing 3 commits merges into `main`.
-- Resulting tag: `v0.17.3`.
-- Release Title: `v0.17.3 - feat: add login`
+- The repository has previously merged 4 PRs on `main`.
+- PR #17 containing 3 commits merges into `main` (making it the 5th merged PR).
+- Resulting tag: `v0.5.3`.
+- Release Title: `v0.5.3 - feat: add login`
 
 ---
 
-## 2. Out-of-Order PR Merge Handling (乱序合并处理)
+## 2. Tag Collision & Force-Overwrite Handling (同名版本覆盖机制)
 
 ### Scenario
-1. PR #18 (containing 2 commits) merges first -> Tagged as `v0.18.2` and Release published.
-2. PR #17 (containing 3 commits) merges later.
+When migrating from legacy rules (where Minor was the GitHub PR ID) to the sequential PR-count rule:
+1. Under the legacy scheme, PR numbers might have skipped ahead (e.g. `v0.17.3` generated earlier due to issues inflating PR numbers).
+2. Under the new scheme, as PRs continue to merge, the cumulative merged PR count will eventually catch up to 17 (e.g. generating `v0.17.2`).
 
 ### Actions Taken
-1. **Tag & Release PR #17**:
-   - PR #17 receives tag `v0.17.3` and its own GitHub Release.
-2. **Backfill Latest PR #18**:
-   - The engine detects that PR #18 was merged earlier with a higher PR ID.
-   - PR #18's patch version is incremented by PR #17's commit count: `2 + 3 = 5`.
-   - A new tag `v0.18.5` is created on PR #18's commit.
-   - PR #18's GitHub Release is updated to `v0.18.5`.
-3. **Trace Citation in PR Description**:
-   - PR #18's description on GitHub is updated to append:
-     > `> 📌 **关联合并追溯**: 后续已合并包含 3 个 commit 的 PR #17，最新小版本升级为 v0.18.5。`
+1. **Force Tag Update**:
+   - The engine detects the pre-existing tag and executes `git tag -f -a <tag> -m ...` followed by `git push origin <tag> --force`.
+   - The remote Git tag is updated to point to the new merge commit.
+2. **Release Overwrite**:
+   - The engine updates the existing GitHub Release via `gh release edit` with the new release title and notes corresponding to the newly merged PR.
+   - Release notes include a clear indication that the tag was updated under the sequential PR-count rule.

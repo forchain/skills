@@ -1,7 +1,7 @@
 ---
 name: pr-tag-release
-description: "Automate PR merge tagging, releases, and backfills. Tags merged PRs with v<Major>.<PR_ID>.<commits>, creates GitHub Releases, and handles out-of-order PR merges by updating the latest release and PR description. Use when setting up, auditing, or configuring automated PR release tagging in a repository."
-summary: "Automate PR merge tagging (`v<Major>.<PR_ID>.<commits>`), GitHub Releases, and out-of-order PR backfills."
+description: "Automate PR merge tagging, releases, and versioning based on sequential merged PR counts. Tags merged PRs with v<Major>.<Merged_PR_Count>.<commits>, creates GitHub Releases, and safely force-overwrites legacy colliding tags. Use when setting up, auditing, upgrading, or configuring automated PR release tagging in a repository."
+summary: "Automate PR merge tagging (`v<Major>.<Merged_PR_Count>.<commits>`), GitHub Releases, and legacy tag overwrite."
 ---
 
 # PR Tag & Release Automation
@@ -9,13 +9,13 @@ summary: "Automate PR merge tagging (`v<Major>.<PR_ID>.<commits>`), GitHub Relea
 ## Overview
 
 `pr-tag-release` automates version tagging and GitHub Release publishing for PR-driven repositories. Every time a Pull Request merges into the primary branch (`main` or `master`), this automation:
-1. Calculates the semantic version: `v<Major>.<PR_ID>.<Patch>`
+1. Calculates the semantic version: `v<Major>.<Merged_PR_Count>.<Patch>`
    - **Major**: Read from root `VERSION` file (defaults to `0`).
-   - **Minor**: Merged PR ID (e.g. `17`).
+   - **Minor**: Sequential count of merged PRs on the target base branch (e.g. `5` for the 5th merged PR). Unaffected by GitHub Issue numbers.
    - **Patch**: Number of commits in the PR (e.g. `3`).
-2. Creates and pushes the Git tag (e.g. `v0.17.3`).
-3. Publishes a GitHub Release with formatted changelog notes.
-4. **Handles Out-of-Order PR merges**: If a lower PR ID merges after a higher PR ID was already merged (e.g., #18 was merged before #17), it tags #17, increments #18's patch version by #17's commit count (e.g., `v0.18.5`), updates #18's release, and appends a backfill citation to PR #18's description.
+2. Creates and pushes the Git tag with force support (e.g. `v0.5.3`).
+3. Publishes or updates the GitHub Release with formatted changelog notes.
+4. **Handles Tag Collisions**: If a tag name collides with a legacy tag (e.g. created when Minor was PR ID), the workflow automatically force-overwrites the Git tag and updates the GitHub Release with the latest PR metadata.
 
 ---
 
@@ -50,12 +50,33 @@ git push
 
 ---
 
-## Out-of-Order PR Merging Example
+## Repository Upgrade Workflow (已有代码库升级工作流)
 
-| Event Order | PR Merged | Commits | Tag Generated | Special Action |
-|---|---|---|---|---|
-| 1st | **PR #18** | 2 | `v0.18.2` | Initial release for PR #18 |
-| 2nd | **PR #17** | 3 | `v0.17.3` | Released. Bumps PR #18 to `v0.18.5` (`2 + 3`) and updates PR #18 description |
+When a user asks to upgrade, update, or sync `pr-tag-release` in an existing repository that already has the workflow installed:
+
+### Step 1: Overwrite Workflow and Scripts
+Copy the latest workflow template and helper scripts into the repository (preserving existing `VERSION`):
+```bash
+cp <skill-dir>/templates/pr-tag-release.yml .github/workflows/pr-tag-release.yml
+cp <skill-dir>/scripts/calculate_release.py .github/scripts/calculate_release.py
+cp <skill-dir>/scripts/publish_release.py .github/scripts/publish_release.py
+```
+
+### Step 2: Commit and Push Upgrade
+```bash
+git add .github/workflows/pr-tag-release.yml .github/scripts/
+git commit -m "ci: upgrade pr-tag-release to sequential merged PR count scheme"
+git push
+```
+
+---
+
+## Tag Collision & Overwrite Example
+
+| Event Order | Merged PR | Commits | Cumulative Merged PRs | Tag Generated | Overwrite Action |
+|---|---|---|---|---|---|
+| Legacy | **PR #17** | 3 | (old rule used PR ID) | `v0.17.3` | Published under legacy scheme |
+| Current | **PR #35** | 2 | 17th merged PR | `v0.17.2` | Forces tag update on Git and overwrites GitHub Release notes |
 
 ---
 

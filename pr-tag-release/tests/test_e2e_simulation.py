@@ -31,6 +31,15 @@ class TestE2ESimulation(unittest.TestCase):
             }
             event_file.write_text(json.dumps(event_payload), encoding="utf-8")
 
+            merged_prs_file = tmp_path / "merged_prs.json"
+            merged_prs_payload = [
+                {"number": 1},
+                {"number": 5},
+                {"number": 10},
+                {"number": 42},
+            ]
+            merged_prs_file.write_text(json.dumps(merged_prs_payload), encoding="utf-8")
+
             plan_file = tmp_path / "plan.json"
 
             # 1. Run calculate_release.py
@@ -41,16 +50,20 @@ class TestE2ESimulation(unittest.TestCase):
                 str(version_file),
                 "--event-path",
                 str(event_file),
+                "--merged-prs-json",
+                str(merged_prs_file),
                 "--output",
                 str(plan_file),
             ]
-            res_calc = subprocess.run(calc_cmd, capture_output=True, text=True, check=True)
+            subprocess.run(calc_cmd, capture_output=True, text=True, check=True)
             self.assertTrue(plan_file.exists())
 
             plan_data = json.loads(plan_file.read_text(encoding="utf-8"))
             self.assertEqual(plan_data["major"], 1)
-            self.assertEqual(plan_data["current_pr"]["tag_name"], "v1.42.5")
-            self.assertFalse(plan_data["out_of_order"])
+            self.assertEqual(plan_data["current_pr"]["pr_id"], 42)
+            self.assertEqual(plan_data["current_pr"]["pr_count"], 4)
+            self.assertEqual(plan_data["current_pr"]["tag_name"], "v1.4.5")
+            self.assertFalse(plan_data["is_collision"])
 
             # 2. Run publish_release.py in dry-run mode
             pub_cmd = [
@@ -61,8 +74,72 @@ class TestE2ESimulation(unittest.TestCase):
                 "--dry-run",
             ]
             res_pub = subprocess.run(pub_cmd, capture_output=True, text=True, check=True)
-            self.assertIn("v1.42.5", res_pub.stdout)
-            self.assertIn("Processing Release for PR #42", res_pub.stdout)
+            self.assertIn("v1.4.5", res_pub.stdout)
+            self.assertIn("git tag -f -a v1.4.5", res_pub.stdout)
+            self.assertIn("git push origin v1.4.5 --force", res_pub.stdout)
+            self.assertIn("gh release create v1.4.5", res_pub.stdout)
+
+    def test_pipeline_collision_overwrite_dry_run(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp_path = Path(tmpdir)
+            version_file = tmp_path / "VERSION"
+            version_file.write_text("0\n", encoding="utf-8")
+
+            event_file = tmp_path / "event.json"
+            event_payload = {
+                "pull_request": {
+                    "number": 88,
+                    "commits": 2,
+                    "title": "feat: colliding tag PR",
+                    "body": "Fixes bug",
+                    "user": {"login": "bob"},
+                    "merged": True,
+                },
+                "repository": {"full_name": "example-org/demo-repo"},
+            }
+            event_file.write_text(json.dumps(event_payload), encoding="utf-8")
+
+            # 3 merged PRs -> tag v0.3.2
+            merged_prs_file = tmp_path / "merged_prs.json"
+            merged_prs_file.write_text(json.dumps([{"number": 10}, {"number": 20}, {"number": 88}]), encoding="utf-8")
+
+            # Existing release already has v0.3.2
+            releases_file = tmp_path / "releases.json"
+            releases_file.write_text(json.dumps([{"tagName": "v0.3.2", "name": "v0.3.2 - old legacy release"}]), encoding="utf-8")
+
+            plan_file = tmp_path / "plan.json"
+
+            calc_cmd = [
+                sys.executable,
+                str(SCRIPTS_DIR / "calculate_release.py"),
+                "--version-file",
+                str(version_file),
+                "--event-path",
+                str(event_file),
+                "--merged-prs-json",
+                str(merged_prs_file),
+                "--releases-json",
+                str(releases_file),
+                "--output",
+                str(plan_file),
+            ]
+            subprocess.run(calc_cmd, capture_output=True, text=True, check=True)
+            plan_data = json.loads(plan_file.read_text(encoding="utf-8"))
+            self.assertEqual(plan_data["current_pr"]["tag_name"], "v0.3.2")
+            self.assertTrue(plan_data["is_collision"])
+
+            pub_cmd = [
+                sys.executable,
+                str(SCRIPTS_DIR / "publish_release.py"),
+                "--plan",
+                str(plan_file),
+                "--dry-run",
+            ]
+            res_pub = subprocess.run(pub_cmd, capture_output=True, text=True, check=True)
+            self.assertIn("Executing force overwrite", res_pub.stdout)
+            self.assertIn("git tag -f -a v0.3.2", res_pub.stdout)
+            self.assertIn("git push origin v0.3.2 --force", res_pub.stdout)
+            self.assertIn("gh release edit v0.3.2", res_pub.stdout)
 
 
 if __name__ == "__main__":
