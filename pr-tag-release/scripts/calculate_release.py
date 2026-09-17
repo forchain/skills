@@ -62,12 +62,18 @@ def count_merged_prs(
 def check_tag_collision(
     tag_name: str,
     existing_releases: List[Dict[str, Any]],
+    existing_git_tags: Optional[List[str]] = None,
 ) -> bool:
-    """Check if the tag name already exists in existing releases."""
+    """Check if the tag name already exists in releases or git tags."""
+    target = tag_name.strip()
     for item in existing_releases:
         tag = item.get("tagName") or item.get("tag_name") or ""
-        if tag.strip() == tag_name.strip():
+        if tag.strip() == target:
             return True
+    if existing_git_tags:
+        for git_tag in existing_git_tags:
+            if git_tag.strip() == target:
+                return True
     return False
 
 
@@ -119,7 +125,7 @@ def plan_release(
     event_payload: Dict[str, Any],
     existing_releases: List[Dict[str, Any]],
     merged_prs: Optional[List[Dict[str, Any]]] = None,
-    explicit_pr_count: Optional[int] = None,
+    existing_git_tags: Optional[List[str]] = None,
 ) -> Dict[str, Any]:
     """Build the complete execution plan."""
     major = parse_major_version(major_str)
@@ -133,13 +139,10 @@ def plan_release(
     author = pr.get("user", {}).get("login") or "github-actions[bot]"
     repo_name = repo.get("full_name") or os.environ.get("GITHUB_REPOSITORY", "")
 
-    if explicit_pr_count and explicit_pr_count > 0:
-        pr_count = explicit_pr_count
-    else:
-        pr_count = count_merged_prs(merged_prs or [], pr_id)
+    pr_count = count_merged_prs(merged_prs or [], pr_id)
 
     preliminary_tag = f"v{major}.{pr_count}.{commits}"
-    is_collision = check_tag_collision(preliminary_tag, existing_releases)
+    is_collision = check_tag_collision(preliminary_tag, existing_releases, existing_git_tags)
 
     current_rel = calculate_current_release(
         major=major,
@@ -169,13 +172,28 @@ def plan_release(
     }
 
 
+def _load_json_data(file_or_raw: Optional[str]) -> List[Any]:
+    """Load JSON from a file path if exists, else parse as raw JSON string."""
+    if not file_or_raw:
+        return []
+    path = Path(file_or_raw)
+    if path.exists():
+        try:
+            return json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            return []
+    try:
+        return json.loads(file_or_raw)
+    except Exception:
+        return []
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Calculate PR tag and release metadata.")
     parser.add_argument("--version-file", help="Path to VERSION file", default="VERSION")
     parser.add_argument("--event-path", help="Path to GITHUB_EVENT_PATH json file")
     parser.add_argument("--releases-json", help="Path to existing releases JSON or raw JSON string")
     parser.add_argument("--merged-prs-json", help="Path to merged PRs list JSON or raw JSON string")
-    parser.add_argument("--pr-count", type=int, help="Explicit merged PR count override")
     parser.add_argument("--output", help="Output plan JSON file path")
     args = parser.parse_args()
 
@@ -190,34 +208,14 @@ def main() -> int:
     if event_path and Path(event_path).exists():
         event_payload = json.loads(Path(event_path).read_text(encoding="utf-8"))
 
-    # Read Existing Releases
-    existing_releases: List[Dict[str, Any]] = []
-    if args.releases_json:
-        if Path(args.releases_json).exists():
-            existing_releases = json.loads(Path(args.releases_json).read_text(encoding="utf-8"))
-        else:
-            try:
-                existing_releases = json.loads(args.releases_json)
-            except Exception:
-                existing_releases = []
-
-    # Read Merged PRs
-    merged_prs: List[Dict[str, Any]] = []
-    if args.merged_prs_json:
-        if Path(args.merged_prs_json).exists():
-            merged_prs = json.loads(Path(args.merged_prs_json).read_text(encoding="utf-8"))
-        else:
-            try:
-                merged_prs = json.loads(args.merged_prs_json)
-            except Exception:
-                merged_prs = []
+    existing_releases = _load_json_data(args.releases_json)
+    merged_prs = _load_json_data(args.merged_prs_json)
 
     plan = plan_release(
         major_str=major_content,
         event_payload=event_payload,
         existing_releases=existing_releases,
         merged_prs=merged_prs,
-        explicit_pr_count=args.pr_count,
     )
 
     formatted_json = json.dumps(plan, indent=2, ensure_ascii=False)

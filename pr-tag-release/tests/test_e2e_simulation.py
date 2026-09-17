@@ -75,8 +75,9 @@ class TestE2ESimulation(unittest.TestCase):
             ]
             res_pub = subprocess.run(pub_cmd, capture_output=True, text=True, check=True)
             self.assertIn("v1.4.5", res_pub.stdout)
-            self.assertIn("git tag -f -a v1.4.5", res_pub.stdout)
-            self.assertIn("git push origin v1.4.5 --force", res_pub.stdout)
+            self.assertIn("git tag -a v1.4.5", res_pub.stdout)
+            self.assertIn("git push origin v1.4.5", res_pub.stdout)
+            self.assertNotIn("git tag -f -a v1.4.5", res_pub.stdout)
             self.assertIn("gh release create v1.4.5", res_pub.stdout)
 
     def test_pipeline_collision_overwrite_dry_run(self):

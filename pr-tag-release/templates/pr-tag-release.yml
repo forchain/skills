@@ -33,14 +33,14 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mkdir -p .release-tmp
-          gh release list --json tagName,name,isLatest,createdAt --limit 100 > .release-tmp/releases.json || echo "[]" > .release-tmp/releases.json
+          gh release list --json tagName,name,isLatest,createdAt --limit 1000 > .release-tmp/releases.json || echo "[]" > .release-tmp/releases.json
 
       - name: Fetch Merged Pull Requests
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TARGET_BRANCH="${{ github.base_ref || github.event.repository.default_branch }}"
-          gh pr list --state merged --base "$TARGET_BRANCH" --limit 1000 --json number > .release-tmp/merged_prs.json || echo "[]" > .release-tmp/merged_prs.json
+          gh pr list --state merged --base "$TARGET_BRANCH" --limit 1000 --json number > .release-tmp/merged_prs.json
 
       - name: Calculate Release Plan
         id: calc
