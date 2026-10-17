@@ -8,6 +8,7 @@ This repository stores personal skills for Codex and other agent runtimes.
 | Skill | Purpose |
 | --- | --- |
 | `blackbox-acceptance-gate` | Gate changes through approved criteria, isolated black-box testing, verifiable evidence, and a traceable verdict. |
+| `caddy-cloudflare-deploy` | Deploy a dockerized app behind an existing Caddy + Cloudflare on a jump-host VPS, with staged end-to-end verification. |
 | `career-agent` | Maintain career memory and generate grounded job-search materials. |
 | `git-period-report` | Generate weekly, monthly, or custom-period reports from Git history and final-state diffs. |
 | `link-agents-skills` | Symlink universal agent skills from standard hub (`~/.agents/skills`) to agent directories with conflict resolution. |
