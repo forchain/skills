@@ -1,0 +1,4 @@
+interface:
+  display_name: "Caddy Cloudflare Deploy"
+  short_description: "Deploy apps behind Caddy + Cloudflare via a jump host"
+  default_prompt: "Use $caddy-cloudflare-deploy to deploy <app> on <target-host> through <jump-host> at <domain>."
