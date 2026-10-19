@@ -16,13 +16,12 @@
 
 ### Issue tracker
 
-Issues and PRDs live in GitHub Issues. See `docs/agents/issue-tracker.md`.
+Issues and specs live in GitHub Issues on `forchain/skills`; use the `gh` CLI. See `docs/agents/issue-tracker.md`.
 
 ### Triage labels
 
-Use the default five-label vocabulary. See `docs/agents/triage-labels.md`.
+Use the default five-label vocabulary (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
 
 ### Domain docs
 
-This is a single-context repository. See `docs/agents/domain.md`.
-
+This is a single-context repository: one root `GLOSSARY.md` plus `docs/adr/`. See `docs/agents/domain.md`.
