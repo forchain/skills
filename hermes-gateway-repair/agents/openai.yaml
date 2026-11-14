@@ -1,0 +1,4 @@
+interface:
+  display_name: "Hermes Gateway Repair"
+  short_description: "Script-first health check, repair, and self-upgrading recovery for Hermes Gateway"
+  default_prompt: "Use $hermes-gateway-repair to check and repair Hermes Gateway with scripts/hermes_gateway_repair.py first, diagnose any unresolvable failures, and self-upgrade the skill via PR."

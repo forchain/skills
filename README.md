@@ -11,6 +11,7 @@ This repository stores personal skills for Codex and other agent runtimes.
 | `caddy-cloudflare-deploy` | Deploy a dockerized app behind an existing Caddy + Cloudflare on a jump-host VPS, with staged end-to-end verification. |
 | `career-agent` | Maintain career memory and generate grounded job-search materials. |
 | `git-period-report` | Generate weekly, monthly, or custom-period reports from Git history and final-state diffs. |
+| `hermes-gateway-repair` | Script-first watchdog, repair tool, and self-upgrading workflow for Hermes Agent gateway startup, mirror, and launchd failures. |
 | `link-agents-skills` | Symlink universal agent skills from standard hub (`~/.agents/skills`) to agent directories with conflict resolution. |
 | `pr-tag-release` | Automate PR merge tagging (`v<Major>.<Merged_PR_Count>.<commits>`), GitHub Releases, and legacy tag overwrite. |
 | `repair-git-history` | Audit and safely repair Git identities, messages, tags, and release history. |
