@@ -14,11 +14,12 @@
 
 ## 铁律：分支命名规则 (Branch Naming Rule)
 
-**创建或更新 Pull Request 之前，分支名必须符合 `feat/<描述>` 或 `fix/<描述>` 格式。**
+**创建或更新 Pull Request 之前，分支名必须符合 `feat/<描述>` 或 `fix/<描述>` 格式，且 `<描述>` 必须概括本次提交的实际内容。**
 
 1. **校验**：执行任何 PR 操作之前，先运行 `git branch --show-current` 校验分支名。
-2. **改名**：分支名不符合格式时，先重命名分支再操作 PR。本地用 `git branch -m <old> <new>`；远程用 GitHub 分支重命名接口，保持已开 PR 关联。
-3. **格式**：`<描述>` 使用小写字母、数字和连字符，例如 `feat/optimize-agent-writing`、`fix/validate-skill-name`。
+2. **改名**：分支名不符合要求时，先重命名分支再操作 PR。本地用 `git branch -m <old> <new>`；远程用 GitHub 分支重命名接口，该接口会关闭已开的 PR，需从新分支重建 PR 并在旧 PR 注明接替关系。
+3. **相关**：`<描述>` 概括本次提交改了什么，让只看分支名的人就能判断变更范围，例如 `feat/optimize-agent-writing`、`fix/validate-skill-name`。
+4. **具体**：`<描述>` 使用小写字母、数字和连字符；无意义或随机命名不合规，例如 `feat/x`、`feat/update`、`feat/test`、`fix/1`。
 
 不符合格式的示例：`wobbegong`、`feat-optimize-agent-writing`、`feature/login`、`hotfix/login`。
 
