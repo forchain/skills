@@ -46,11 +46,7 @@
 | AC-001 |  |  |  | pending |
 
 ## Failure Classification
-| Classification | Definition | Required Action |
-| --- | --- | --- |
-| actionable | Can be safely handled through approved public interfaces or documented operator actions | Remediate once, record evidence, retry once |
-| force_majeure | Cannot be recovered inside the current run | Mark affected objective skipped, continue safe independent objectives |
-| hard_fail | Required capability failed after allowed remediation | Reopen affected work and stop acceptance |
+Classify every exception with the table in [`references/failures-and-remediation.md`](../references/failures-and-remediation.md).
 
 ## Review
 - Reviewed by User:

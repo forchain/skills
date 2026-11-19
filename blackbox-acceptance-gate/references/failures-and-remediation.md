@@ -32,19 +32,6 @@ Every exception record must contain the gate and test, observed error, classific
 
 For a system defect or operational reliability gap, record observable facts before continuing: criterion, public path and actions, timestamp, scope, observed result, expected result, and evidence artifact. Never include a suspected internal cause in a strict black-box handoff.
 
-Append the smallest development demand to the existing plan for this workflow. Create a plan through the repository's normal planning process only when none exists. Once chosen, that plan remains the single source of truth.
-
-```text
-Development demand: [short title]
-Source acceptance item: [gate/test ID]
-Finding type: system_defect | operational_reliability_gap
-Observed evidence: [timestamp, public path, result, artifact]
-Expected behavior: [externally visible behavior]
-Operational risk: [user/operator impact]
-Required behavior: [minimal behavior change]
-Safety constraints: [approval and automation limits]
-Acceptance criteria: [black-box checks]
-Status: proposed | approved | implemented | accepted | deferred
-```
+Append the smallest development demand, using the block in [`coordination-and-escalation.md`](coordination-and-escalation.md#development-demand), to the existing plan for this workflow. Create a plan through the repository's normal planning process only when none exists. Once chosen, that plan remains the single source of truth.
 
 The run may continue after a bypass only when remaining tests are still meaningful and the report states that the system gap remains open. Ask for User review when a demand changes behavior, scope, operational risk, or safety policy.
