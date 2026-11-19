@@ -1,97 +1,81 @@
 ---
 name: blackbox-acceptance-gate
-description: Gate acceptance of new or existing implementations through an approved contract, independent black-box testing, externally verifiable evidence, and a traceable verdict. Use when development and acceptance must stay isolated or when a release needs user-approved acceptance criteria.
-summary: Gate changes through approved criteria, isolated black-box testing, verifiable evidence, and a traceable verdict.
+description: "Gate a new or existing implementation through a user-approved acceptance contract, isolated black-box testing, externally verifiable evidence, and a traceable verdict. Use when acceptance must stay independent of development, or when a release or existing build needs user-approved acceptance criteria."
+summary: "Gate changes through approved criteria, isolated black-box testing, verifiable evidence, and a traceable verdict."
 ---
 
-# Black-Box Acceptance Gate
+# Black-Box Acceptance
 
-Run acceptance as a gated state machine: **contract -> precheck -> approval -> isolation -> execution -> verdict**. Durable artifacts, not conversation history, are the source of truth.
+Acceptance runs as a state machine — **contract → probe → approval → isolation → execution → verdict** — and its durable artifacts, not conversation history, are the source of truth.
 
-## Boundary
+## Roles and boundary
 
-The Testing Agent may use only approved public interfaces and operator-visible outputs: documented UI, CLI, API, generated artifacts, public logs, and data access only when it is a documented product surface. It must not inspect source, diffs, implementation notes, private state, mocks that replace user-visible behavior, or Development Agent reasoning.
+You are the Acceptance Coordinator: you own the contract, the gates, and routing. The User owns goals, constraints, exceptions, resources, and final scope. The Development Agent changes the system under test; the Testing Agent evaluates it independently.
 
-The User owns goals, constraints, exceptions, resources, and final scope decisions. The Acceptance Coordinator owns the contract, gates, and routing. The Development Agent changes the system under test. The Testing Agent independently evaluates it.
+**Black-box** means the Testing Agent reads only approved public surfaces — documented UI, CLI, API, generated artifacts, public logs, and data access where it is a documented product surface. Source, diffs, implementation notes, private state, mocks that replace user-visible behavior, and Development reasoning stay out of its inputs.
 
-## 1. Bind The Contract
+## 1. Bind the contract
 
 Choose the mode:
 
 - **New development**: define acceptance before implementation.
-- **Existing implementation**: treat the current build as the system under test and reconstruct criteria only from user intent and public requirements.
+- **Existing implementation**: the current build is the system under test; reconstruct criteria from user intent and public requirements only.
 
-Create or update the four artifacts from `templates/`:
+Copy the four artifacts from `templates/` — acceptance contract, precondition report, testing checklist, execution report — and fill their Skill Binding Metadata with `skill_id: blackbox-acceptance-gate`.
 
-- acceptance contract (`acceptance-contract.md`)
-- precondition check report (`precondition-report.md`)
-- testing checklist (`testing-checklist.md`)
-- execution report (`execution-report.md`)
+Default run root: `docs/acceptance/blackbox-acceptance/<run-id>/`. Keep an established repository location when one exists and record it as `skill_run_root`.
 
-Default run root: `docs/acceptance/blackbox-acceptance/<run-id>/`. Preserve an established repository location when one exists and record it as `skill_run_root`.
-
-The contract header must contain:
-
-```yaml
-skill_id: blackbox-acceptance-gate
-skill_run_root: <artifact directory>
-workflow_id: <stable run id>
-source_contract: <path>
-```
-
-Map every required acceptance gate to at least one checklist item with a purpose, setup, public actions, expected observable result, evidence, human verification path, and failure handling. Create or reuse a development plan only when system changes are required.
+Map every required acceptance gate to at least one checklist item: purpose, setup, public actions, expected observable result, evidence, human verification path, failure handling. Create or reuse a development plan only when system changes are required.
 
 **Complete when:** the four artifacts exist, metadata is valid, every required gate is testable from the outside, and every gate has an evidence path.
 
-## 1.5 Precheck Dependencies
+## 2. Probe the preconditions
 
-Before presenting any contract or plan to the User for review, perform mandatory read-only diagnostic checks for all required external resources, dependencies, and prerequisites.
+Before showing any contract to the User, prove every external dependency works.
 
-1. **Identify dependencies**: Enumerate every external resource required for execution or acceptance (e.g., databases, log directory access, exchange/third-party API endpoints, test account credentials, environment variables, required CLI binaries).
-2. **Execute diagnostic probes**: Run read-only, non-mutating operator diagnostic commands (e.g., connection ping, API status check, permission read test, version check). Do NOT use mock objects to fake connectivity or assume prerequisites pass without empirical proof.
-3. **Record evidence**: Append raw diagnostic outputs, timestamps, and pass/fail statuses to `precondition-report.md`.
-4. **Enforce hard block**: If any required dependency is `failed` or `unclear/missing`, **DO NOT submit the document/contract for User Review**. Issue a `Precondition Shortage Alert` listing the exact missing resources or failed checks, resolve them or prompt the User for missing credentials/info, and re-probe until all dependencies pass.
+1. **List** each dependency execution or acceptance needs: databases, log access, third-party APIs, test accounts, credentials, environment variables, CLI binaries.
+2. **Probe** each one read-only — ping, status check, permission read, version check. No mocks, no assumed passes.
+3. **Record** raw output, timestamp, and pass/fail in `precondition-report.md`.
+4. **Block** on any `failed` or `unclear` dependency: issue a Precondition Shortage Alert naming the exact gap, resolve it or ask the User for the missing resource, and re-probe until everything passes.
 
-**Complete when:** `precondition-report.md` exists, 100% of required dependencies have `passed` status with timestamped diagnostic evidence, and `precheck_status` in the contract is set to `passed`.
+**Complete when:** every required dependency is `passed` with timestamped evidence and the contract's `precheck_status` is `passed`.
 
-## 2. Lock Approval
+## 3. Lock approval
 
-Present the artifacts, precheck report, and checklist to the User ONLY AFTER Section 1.5 (Precheck Dependencies) has 100% passed. Do not implement or execute tests until the User approves the current contract and checklist.
+Present the artifacts, precheck report, and checklist to the User, and wait for approval before implementing or testing.
 
-Before approval, limit discovery to read-only work without external side effects, scarce-resource use, or third-party mutation. If feedback changes scope, evidence, resources, permissions, remediation, or verifiability, update the artifacts, re-run prechecks if dependencies changed, and obtain approval again for any material contract change.
+Keep discovery before approval read-only: no external side effects, scarce-resource use, or third-party mutation. Material feedback on scope, evidence, resources, permissions, remediation, or verifiability updates the artifacts and needs approval again; re-probe if dependencies changed. If the User rejects evidence marked passed, set it to `reopened` or `failed` immediately.
 
-If the User rejects evidence previously marked passed, set the item to `reopened` or `failed` immediately.
+**Complete when:** the precheck report is 100% passed, the contract records the approved version and date, and all material feedback appears in the artifact set.
 
-**Complete when:** `precondition-report.md` is 100% passed, the contract records the approved version and date, and all material feedback appears in the artifact set.
+## 4. Enforce isolation
 
-## 3. Enforce Isolation
+Check for sub-agents before assigning work.
 
-Check whether independent sub-agents are available before assigning work.
-
-- When available, Development and Testing MUST use separate sub-agents. Do not spawn Development for testing-only work or when Testing finds no system change is needed. Close each agent when its assignment ends.
-- Give Testing only the approved checklist, public setup, allowed observation methods, user-visible criteria, and contract metadata. Include: `This contract is governed by blackbox-acceptance-gate.` Require it to echo the skill name and run root before execution.
-- When unavailable, say: `Sub-agent isolation unavailable; strict black-box mode cannot be guaranteed in this session.` Ask the User to enable sub-agents or explicitly approve degraded mode. If strict isolation is required, stop. In approved degraded mode, freeze Testing inputs before consulting implementation details and never claim independent validation.
+- **Available**: Development and Testing run as separate sub-agents. Do not spawn Development for testing-only work or when Testing finds no system change needed. Close each agent when its assignment ends.
+- **Testing's inputs**: the approved checklist, public setup, allowed observation methods, user-visible criteria, and contract metadata — nothing else. Include: `This contract is governed by blackbox-acceptance-gate.` Require it to echo the skill name and run root before executing.
+- **Unavailable**: say `Sub-agent isolation unavailable; strict black-box mode cannot be guaranteed in this session.` Then ask the User to enable sub-agents or approve degraded mode; stop if strict isolation is required. In degraded mode, freeze Testing inputs before consulting implementation details and never claim independent validation.
 
 **Complete when:** role assignments and permitted inputs are recorded, or degraded mode has explicit User approval.
 
-## 4. Execute The Checklist
+## 5. Execute the checklist
 
-Before each action, link it to a checklist item. If none applies, stop and amend the approved artifacts before proceeding.
+Link every action to a checklist item; if none applies, stop and amend the approved artifacts first.
 
 For each item:
 
 1. Set `in_progress` and record the start time.
 2. Execute only approved public actions within safety and retry limits.
-3. Capture the evidence required by the checklist.
-4. Set `passed`, `failed`, `blocked`, `skipped_force_majeure`, or `reopened` and append evidence to the report.
+3. Capture the evidence the checklist requires.
+4. Set `passed`, `failed`, `blocked`, `skipped_force_majeure`, or `reopened`, and append the evidence to the report.
 
-Evidence for every required item must include its ID and purpose; timestamp and timezone; system, environment, and account or scope; affected resources; externally visible identifiers; observed versus expected status; exact human verification path and filters; decision; and residual risk. A capability without user-verifiable evidence cannot pass.
+Every required item's evidence carries its ID and purpose; timestamp and timezone; system, environment, and account or scope; affected resources; externally visible identifiers; observed versus expected result; exact human verification path and filters; decision; and residual risk. A capability without user-verifiable evidence cannot pass.
 
-On any error, blocker, bypass, disputed result, or evidence gap, read and apply `references/failures-and-remediation.md` before continuing. For escalation or resource decisions, also read `references/coordination-and-escalation.md`.
+On any error, blocker, bypass, disputed result, or evidence gap, apply `references/failures-and-remediation.md` before continuing. When deciding whether to resolve an issue in-contract, request a low-risk resource, or escalate to the User, also apply `references/coordination-and-escalation.md`.
 
-**Complete when:** every required checklist item has a terminal status and evidence, and no downstream test ran behind a failed prerequisite that made its result meaningless.
+**Complete when:** every required item has a terminal status and evidence, and no test ran behind a failed prerequisite that made its result meaningless.
 
-## 5. Issue The Verdict
+## 6. Issue the verdict
 
 Accept only when:
 
@@ -99,8 +83,8 @@ Accept only when:
 - all non-passing required items are `skipped_force_majeure` and the contract permits cycle acceptance with explicit annotation; or
 - the User explicitly accepts a documented exception.
 
-Any non-force-majeure failure leaves the run unaccepted. Reopen affected items before returning to development. Keep system-specific outcomes, credentials, and decisions in run artifacts, never in this skill.
+Any other failure leaves the run unaccepted; reopen affected items before returning to development. Keep system-specific outcomes, credentials, and decisions in run artifacts, never in this skill.
 
-The final report must enumerate passed, failed, blocked, reopened, and force-majeure-skipped items; remediation; open development demands; agent allocation and closure; residual risk; and the acceptance decision.
+The final report enumerates passed, failed, blocked, reopened, and force-majeure-skipped items; remediation; open development demands; agent allocation and closure; residual risk; and the acceptance decision.
 
 **Complete when:** the report traces every verdict to an approved gate and externally verifiable evidence, all agents are closed, and the run is accepted or stopped on a specific User-owned decision or resource.

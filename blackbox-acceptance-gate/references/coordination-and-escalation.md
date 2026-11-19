@@ -64,12 +64,14 @@ Keep development demands separate from acceptance-harness fixes. A harness fix m
 Development demand: [short title]
 Source acceptance item: [criterion/test ID]
 Finding type: system_defect | operational_reliability_gap
-Observed: [actual externally visible behavior]
+Observed evidence: [timestamp, public path, result, artifact]
 Expected behavior: [required externally visible behavior]
 Operational risk: [operator/user impact if not fixed]
-Evidence: [logs, reports, screenshots, response IDs, or artifacts]
+Required behavior: [minimal behavior change]
+Safety constraints: [approval and automation limits]
 Acceptance criteria: [black-box checks required before closure]
 Decision needed: [approve / defer / reject / needs scope decision]
+Status: proposed | approved | implemented | accepted | deferred
 ```
 
 Append the demand to an active development document for the same workflow. If none exists, use the repository's normal planning process to create one. Keep later requirements for the same workflow in that document.
