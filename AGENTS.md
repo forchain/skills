@@ -12,6 +12,16 @@
 3. **隔离全局账号状态**：**严禁**盲目使用当前系统全局激活或登录的 GitHub 账号/凭证来推断本项目的提交与分支身份。全局激活的账号可能是为其他项目使用的，而不同项目使用的 GitHub 账号各不相同。
 4. **绑定身份执行**：所有的提交 Author/Committer 以及 GitHub CLI / API 操作，必须严格与 `remote.origin.url` 解析出来的账号对齐。
 
+## 铁律：分支命名规则 (Branch Naming Rule)
+
+**创建或更新 Pull Request 之前，分支名必须符合 `feat/<描述>` 或 `fix/<描述>` 格式。**
+
+1. **校验**：执行任何 PR 操作之前，先运行 `git branch --show-current` 校验分支名。
+2. **改名**：分支名不符合格式时，先重命名分支再操作 PR。本地用 `git branch -m <old> <new>`；远程用 GitHub 分支重命名接口，保持已开 PR 关联。
+3. **格式**：`<描述>` 使用小写字母、数字和连字符，例如 `feat/optimize-agent-writing`、`fix/validate-skill-name`。
+
+不符合格式的示例：`wobbegong`、`feat-optimize-agent-writing`、`feature/login`、`hotfix/login`。
+
 ## Agent skills
 
 ### Issue tracker
